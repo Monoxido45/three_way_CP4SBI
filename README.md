@@ -13,8 +13,8 @@ pip install .
 ### Using Conda
 
 ```bash
-conda create -n tw_cp4sbi_env python=3.9
-conda activate tw_cp4sbi_env
+conda create -n tw_CP4SBI_env python=3.9
+conda activate tw_CP4SBI_env
 pip install .
 ```
 

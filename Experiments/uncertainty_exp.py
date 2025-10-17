@@ -55,7 +55,7 @@ def compare_uncertainty_regions(task_name,
         prior = task.get_prior()
     else:
         print("Using custom Gaussian Mixture task")
-        from CP4SBI.gmm_task import GaussianMixture
+        from tw_CP4SBI.gmm_task import GaussianMixture
 
         task = GaussianMixture(dim=2, prior_bound=3.0)
         simulator = task.get_simulator()
@@ -64,7 +64,7 @@ def compare_uncertainty_regions(task_name,
     # Load the dictionary from the pickle file
     if X_str:
         posterior_data_path = (
-            original_path + f"/Results/posterior_data/{task_name}_posterior_samples.pkl"
+            original_path + f"/Experiments/posterior_data/{task_name}_posterior_samples.pkl"
         )
         with open(posterior_data_path, "rb") as f:
             X_dict = pickle.load(f)
@@ -72,27 +72,27 @@ def compare_uncertainty_regions(task_name,
         # Load the X_list pickle file from the X_data folder
         if B_train >= 20000:
             x_data_path = os.path.join(
-            original_path, "Results/X_data", f"{task_name}_X_samples_30000.pkl"
+            original_path, "Experiments/X_data", f"{task_name}_X_samples_30000.pkl"
         )
             with open(x_data_path, "rb") as f:
                 X_data = pickle.load(f)
 
                  # Load the X_list pickle file from the X_data folder
             theta_data_path = os.path.join(
-                original_path, "Results/X_data", f"{task_name}_theta_samples_30000.pkl"
+                original_path, "Experiments/X_data", f"{task_name}_theta_samples_30000.pkl"
             )
             with open(theta_data_path, "rb") as f:
                 theta_list = pickle.load(f)
         else:
             x_data_path = os.path.join(
-                original_path, "Results/X_data", f"{task_name}_X_samples_20000.pkl"
+                original_path, "Experiments/X_data", f"{task_name}_X_samples_20000.pkl"
             )
             with open(x_data_path, "rb") as f:
                 X_data = pickle.load(f)
 
             # Load the X_list pickle file from the X_data folder
             theta_data_path = os.path.join(
-                original_path, "Results/X_data", f"{task_name}_theta_samples_20000.pkl"
+                original_path, "Experiments/X_data", f"{task_name}_theta_samples_20000.pkl"
             )
             with open(theta_data_path, "rb") as f:
                 theta_list = pickle.load(f)
@@ -288,8 +288,6 @@ def compare_uncertainty_regions(task_name,
     uncertainty_map_locart, locart_mask = {}, {}
     oracle_mask, mae_dict_locart = {}, {}
     target_coverage = 1-alpha
-    
-    error_locart_dict = {}
 
     theta_train_used = theta_train_all[:, :2]
     # training the NPE only once with B = 10000
@@ -399,35 +397,12 @@ def compare_uncertainty_regions(task_name,
             strategy=strategy,
         )
 
-
-        # obtaining prob of each kind of error by using true post samples
-        not_in_oracle_region = conf_scores_2d > oracle_cutoff_2d
-        # computing type 2 error for locart and CDF
-        not_in_oracle_but_in_locart = np.logical_and(
-            not_in_oracle_region, locart_unc_true > 0.99
-        )
-        type_2_error_locart = np.sum(not_in_oracle_but_in_locart)/np.sum(not_in_oracle_region)
-
-
-        in_oracle_region = conf_scores_2d <= oracle_cutoff_2d
-
-        # computing type 1 error for locart and CDF
-        in_oracle_but_not_in_locart = np.logical_and(
-            in_oracle_region, locart_unc_true < 0.01
-        )
-        type_1_error_locart = np.sum(in_oracle_but_not_in_locart) / np.sum(in_oracle_region)
-
-        
-        print(f"B={B}: Type 1 error LOCART={type_1_error_locart:.4f}, Type 2 error LOCART={type_2_error_locart:.4f}")
-    
-        error_locart_dict[B] = [type_1_error_locart, type_2_error_locart]
-
         locart_mask[B] = locart_mask_obs
         oracle_mask[B] = real_mask_obs
         i += 1
     
     # return everything for further plotting
-    return [uncertainty_map_locart, locart_mask, oracle_mask, mae_dict_locart, error_locart_dict]
+    return [uncertainty_map_locart, locart_mask, oracle_mask, mae_dict_locart]
 
 def plot_uncertainty_regions(
         all_results_list, 
