@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from tqdm import tqdm
-from CP4SBI.scores import HPDScore, KDE_HPDScore
+from tw_CP4SBI.scores import HPDScore, KDE_HPDScore
 from scipy.stats import gaussian_kde
 
 
