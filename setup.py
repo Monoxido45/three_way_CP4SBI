@@ -27,7 +27,8 @@ setup(
         "sbi>=0.24.0",
         "numpyro",
         "jax",
-        "sbibm"
+        "sbibm",
+        "numba",
     ],
     python_requires=">=3.10",
     zip_safe=False,
