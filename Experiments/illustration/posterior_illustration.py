@@ -1,7 +1,9 @@
 # posterior_npe_two_moons_sbibm.py
 import numpy as np
 import torch
+
 import matplotlib.pyplot as plt
+plt.rcParams.update({'font.size': 16})
 
 from sbi.utils import BoxUniform
 from sbi.inference import SNPE
@@ -229,7 +231,7 @@ def main():
         )
         ax_cut.set_xlim(-1, 1)
         ax_cut.set_xticks([])
-        ax_cut.set_ylabel("score cutoff (−density)")
+        ax_cut.set_ylabel(r"$t(\mathbf{x})$")
         ax_cut.grid(alpha=0.2)
         plt.tight_layout()
         out_cut = "posterior_cutoff_CI_errorplot.png"
