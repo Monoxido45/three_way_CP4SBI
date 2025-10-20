@@ -3,6 +3,7 @@ import numpy as np
 import torch
 
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 plt.rcParams.update({'font.size': 16})
 
 from sbi.utils import BoxUniform
@@ -63,8 +64,6 @@ def plot_posterior(X, Y, Z, out="posterior_npe_two_moons_sbibm.png", cmap="virid
     if ylim is not None:
         ax.set_ylim(*ylim)
 
-    # No colorbar and no contour lines
-
     plt.tight_layout()
     fig.savefig(out, dpi=150)
     print(f"Saved figure to {out}")
@@ -76,7 +75,7 @@ def main():
     np.random.seed(0)
 
     # Load sbibm task (two_moons)
-    task = get_task("two_moons")  # uses sbibm's two_moons simulator and prior
+    task = get_task("two_moons")
     sbibm_simulator = task.get_simulator()
     sbibm_prior = task.get_prior()
 
@@ -112,6 +111,8 @@ def main():
     except Exception:
         iy0, ix0 = np.unravel_index(np.argmax(Z), Z.shape)
         cx0, cy0 = float(X[iy0, ix0]), float(Y[iy0, ix0])
+
+    
     wx0, wy0 = 0.20, 0.20
     xlim0 = (max(-1.0, cx0 - wx0), min(1.0, cx0 + wx0))
     ylim0 = (max(-1.0, cy0 - wy0), min(1.0, cy0 + wy0))
@@ -270,12 +271,21 @@ def main():
     # 5) Produce two separate figures per request (no dark background, no legends, no target region)
     # (a) Only CP4SBI contour line (blue) with viridis density background
     fig1, ax1 = plt.subplots(figsize=(4.0, 4.0))
+    # adding to remove colors from outside the threshold
+    threshold = 0.05
+    nb = 256
+    base = plt.get_cmap("viridis", nb)
+    colors = base(np.linspace(0, 1, nb))
+    cut = int(np.round(threshold * (nb - 1)))
+    colors[:cut, :] = np.array([1.0, 1.0, 1.0, 1.0])  # white for values < threshold
+    cmap_custom = mcolors.ListedColormap(colors)
+
     # Add viridis density background
     ax1.imshow(
         dens_grid,
         origin='lower',
         extent=(-1, 1, -1, 1),
-        cmap='viridis',
+        cmap=cmap_custom,
         alpha=1.0,
         interpolation='bilinear',
         zorder=0,
